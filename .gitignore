@@ -1,5 +1,6 @@
 # PROJECT SPECIFIC
 weights/
+sample_images/*
 
 # Created by https://www.toptal.com/developers/gitignore/api/flask,python,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=flask,python,macos
