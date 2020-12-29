@@ -1,0 +1,8 @@
+POST http://127.0.0.1:5000/send-images HTTP/1.1
+content-type: multipart/form-data
+
+<@ sample_images/201210-database_structure.png
+
+
+###
+GET http://127.0.0.1:5000/send-images
