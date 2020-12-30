@@ -46,7 +46,7 @@ detectors = {
 
 detection_thresholds = {
     'face': 0.3,
-    'plate': 0.3
+#    'plate': 0.3
 }
 
 # build anonymizer
