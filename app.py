@@ -46,12 +46,11 @@ detectors = {
 
 detection_thresholds = {
     'face': 0.3,
-#    'plate': 0.3
+    #    'plate': 0.3
 }
 
 # build anonymizer
 anonymizer = Anonymizer(obfuscator=obfuscator, detectors=detectors)
-
 
 
 @app.route('/')
@@ -63,7 +62,8 @@ def allowed_file(filename: str) -> bool:
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def get_ext(filename:str) -> str:
+
+def get_ext(filename: str) -> str:
     _, ext = os.path.splitext(filename)
     res = ext.replace(".", "")
 
@@ -71,7 +71,8 @@ def get_ext(filename:str) -> str:
     if res.lower() == 'jpg':
         res = 'jpeg'
 
-    return  res
+    return res
+
 
 @app.route('/transform', methods=['POST'])
 @cross_origin()
@@ -104,10 +105,11 @@ def transform():
 
         else:
             res_image = call_anonymizer_anonymize(file)
-            res_image.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename('ANON_' + file.filename)))
+            if STORE_FILES: res_image.save(
+                os.path.join(app.config['UPLOAD_FOLDER'], secure_filename('ANON_' + file.filename)))
 
         tmp = tempfile.TemporaryFile()
-        res_image.save(tmp,format=get_ext(file.filename).lower())
+        res_image.save(tmp, format=get_ext(file.filename).lower())
         tmp.seek(0)
         resp = Response(tmp.read())
         # resp = Response(res_image, mimetype=file.mimetype, )
