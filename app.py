@@ -118,9 +118,6 @@ def transform():
         # just send the file back
         resp = Response(file.read(), mimetype=file.mimetype)
 
-    # bypassing CORS for now
-    resp.headers.add("Access-Control-Allow-Origin", "*")
-
     return resp
 
 
