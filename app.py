@@ -9,6 +9,7 @@ from PIL import Image
 from flask import Flask, request, send_file, jsonify, make_response, Response
 from flask_cors import CORS, cross_origin
 from werkzeug.utils import secure_filename
+from anonymizer.anonymizer.detection.opencv_detector import OpenCVDetector
 
 from anonymizer.anonymizer.anonymization.anonymizer import Anonymizer
 from anonymizer.anonymizer.detection.detector import Detector
@@ -23,7 +24,7 @@ app.config['CORS_EXPOSE_HEADERS'] = ['filename']
 
 # GLOBAL SETTINGS
 PROCESS_FILES = True
-STORE_FILES = True
+STORE_FILES = False
 WEIGHTS_PATH = 'weights'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
@@ -38,7 +39,8 @@ kernel_size, sigma, box_kernel_size = obfuscation_params.split(',')
 # create obfuscator and detectors
 obfuscator = Obfuscator(kernel_size=int(kernel_size), sigma=float(sigma), box_kernel_size=int(box_kernel_size))
 detectors = {
-    'face': Detector(kind='face', weights_path=get_weights_path(WEIGHTS_PATH, kind='face')),
+    # 'face': Detector(kind='face', weights_path=get_weights_path(WEIGHTS_PATH, kind='face')),
+    'face': OpenCVDetector(),
     'plate': Detector(kind='plate', weights_path=get_weights_path(WEIGHTS_PATH, kind='plate'))
 }
 
@@ -49,6 +51,7 @@ detection_thresholds = {
 
 # build anonymizer
 anonymizer = Anonymizer(obfuscator=obfuscator, detectors=detectors)
+
 
 
 @app.route('/')
@@ -62,7 +65,13 @@ def allowed_file(filename: str) -> bool:
 
 def get_ext(filename:str) -> str:
     _, ext = os.path.splitext(filename)
-    return ext.replace(".","")
+    res = ext.replace(".", "")
+
+    # edge cases i hate
+    if res.lower() == 'jpg':
+        res = 'jpeg'
+
+    return  res
 
 @app.route('/transform', methods=['POST'])
 @cross_origin()
@@ -98,7 +107,7 @@ def transform():
             res_image.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename('ANON_' + file.filename)))
 
         tmp = tempfile.TemporaryFile()
-        res_image.save(tmp,format=get_ext(file.filename))
+        res_image.save(tmp,format=get_ext(file.filename).lower())
         tmp.seek(0)
         resp = Response(tmp.read())
         # resp = Response(res_image, mimetype=file.mimetype, )
