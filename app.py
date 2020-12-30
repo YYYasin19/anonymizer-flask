@@ -41,7 +41,7 @@ obfuscator = Obfuscator(kernel_size=int(kernel_size), sigma=float(sigma), box_ke
 detectors = {
     # 'face': Detector(kind='face', weights_path=get_weights_path(WEIGHTS_PATH, kind='face')),
     'face': OpenCVDetector(),
-    'plate': Detector(kind='plate', weights_path=get_weights_path(WEIGHTS_PATH, kind='plate'))
+    # 'plate': Detector(kind='plate', weights_path=get_weights_path(WEIGHTS_PATH, kind='plate'))
 }
 
 detection_thresholds = {
